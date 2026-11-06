@@ -1,9 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 
 import {
   initialEmployees,
@@ -15,14 +10,12 @@ interface EmployeeContextType {
 
   addEmployee: (employee: Omit<Employee, "id">) => void;
 
-  updateEmployee: (
-    id: number,
-    employee: Omit<Employee, "id">
-  ) => void;
+  updateEmployee: (id: number, employee: Omit<Employee, "id">) => void;
+  deleteEmployee: (id: number) => void;
 }
 
 const EmployeeContext = createContext<EmployeeContextType | undefined>(
-  undefined
+  undefined,
 );
 
 interface EmployeeProviderProps {
@@ -49,17 +42,20 @@ export function EmployeeProvider({ children }: EmployeeProviderProps) {
     });
   };
 
+  const deleteEmployee = (id: number) => {
+    setEmployees((previousEmployees) =>
+      previousEmployees.filter((employee) => employee.id !== id),
+    );
+  };
   // Update existing employee
   const updateEmployee = (
     id: number,
-    updatedEmployee: Omit<Employee, "id">
+    updatedEmployee: Omit<Employee, "id">,
   ) => {
     setEmployees((previousEmployees) =>
       previousEmployees.map((employee) =>
-        employee.id === id
-          ? { ...updatedEmployee, id }
-          : employee
-      )
+        employee.id === id ? { ...updatedEmployee, id } : employee,
+      ),
     );
   };
 
@@ -69,6 +65,7 @@ export function EmployeeProvider({ children }: EmployeeProviderProps) {
         employees,
         addEmployee,
         updateEmployee,
+        deleteEmployee,
       }}
     >
       {children}
@@ -80,9 +77,7 @@ export function useEmployees() {
   const context = useContext(EmployeeContext);
 
   if (!context) {
-    throw new Error(
-      "useEmployees must be used inside EmployeeProvider"
-    );
+    throw new Error("useEmployees must be used inside EmployeeProvider");
   }
 
   return context;

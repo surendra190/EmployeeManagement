@@ -1,5 +1,6 @@
 import type { Employee } from "./employeeData";
 import { useNavigate } from "react-router-dom";
+import { useEmployees } from "../../context/EmployeeContext";
 
 interface EmployeeTableProps {
   employees: Employee[];
@@ -7,7 +8,16 @@ interface EmployeeTableProps {
 
 function EmployeeTable({ employees }: EmployeeTableProps) {
   const navigate = useNavigate();
+  const { deleteEmployee } = useEmployees();
+  const handleDelete = (id: number, name: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${name}?`,
+    );
 
+    if (confirmed) {
+      deleteEmployee(id);
+    }
+  };
   return (
     <div className="employee-table-wrapper">
       <table className="employee-table">
@@ -62,6 +72,15 @@ function EmployeeTable({ employees }: EmployeeTableProps) {
                   onClick={() => navigate(`/employees/edit/${employee.id}`)}
                 >
                   Edit
+                </button>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(employee.id, employee.name)}
+                  className="btn-delete"
+                >
+                  Delete
                 </button>
               </td>
             </tr>
